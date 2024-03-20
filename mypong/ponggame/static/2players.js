@@ -22,7 +22,6 @@ var upKeyPressed = false;
 var downKeyPressed = false;
 const PADDLE_SPEED = 6;
 
-// WebSocket connection
 const socket = new WebSocket('ws://' + window.location.host + '/ws/pong/');
 
 socket.onopen = function(e) {
@@ -32,8 +31,6 @@ socket.onopen = function(e) {
 socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
     if (data.paddle_data) {
-        // Here you would handle the received paddle data
-        // For example, if you receive the position of the opponent's paddle, update it
         if (data.paddle_data.paddle === 'left') {
             paddle1Y = data.paddle_data.position;
         } else if (data.paddle_data.paddle === 'right') {

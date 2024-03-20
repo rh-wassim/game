@@ -35,6 +35,13 @@
             margin-top: 10px;
             padding: 5px 15px;
         }
+
+        #currentMatchInfo {
+            margin-top: 20px;
+            color: #FFF;
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -44,11 +51,15 @@
         <input type="text" id="player2" placeholder="Player 2 Alias"><br>
         <input type="text" id="player3" placeholder="Player 3 Alias"><br>
         <input type="text" id="player4" placeholder="Player 4 Alias"><br>
-        <button onclick="handleStartTournamentClick()">Start Tournament</button>
+        <button id="startTournamentButton">Start Tournament</button>
     </div>
-    <canvas id="gameCanvas" width="800" height="600" style="display:none;"></canvas>
+
+    <!-- Match Info Display -->
+    <div id="currentMatchInfo"></div>
+
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
     
     <!-- Include the JavaScript file for the game logic -->
-    <script src="2players.js"></script>
+    <script src="tourno.js"></script>
 </body>
 </html>
