@@ -22,35 +22,6 @@ var upKeyPressed = false;
 var downKeyPressed = false;
 const PADDLE_SPEED = 6;
 
-// WebSocket connection
-const socket = new WebSocket('ws://' + window.location.host + '/ws/pong/');
-
-socket.onopen = function(e) {
-    console.log('WebSocket is connected.');
-};
-
-socket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    if (data.paddle_data) {
-        // Here you would handle the received paddle data
-        // For example, if you receive the position of the opponent's paddle, update it
-        if (data.paddle_data.paddle === 'left') {
-            paddle1Y = data.paddle_data.position;
-        } else if (data.paddle_data.paddle === 'right') {
-            paddle2Y = data.paddle_data.position;
-        }
-    }
-};
-
-socket.onclose = function(e) {
-    console.error('WebSocket is closed.');
-};
-
-socket.onerror = function(e) {
-    console.error('WebSocket encountered an error: ', e.message);
-};
-
-
 window.onload = function() {
     canvas = document.getElementById('gameCanvas');
     canvasContext = canvas.getContext('2d');
@@ -64,25 +35,16 @@ window.onload = function() {
     canvas.addEventListener('mousedown', handleMouseClick);
 
     document.addEventListener('keydown', function(event) {
-		let paddleData = null;
-		if (event.key === 'w' || event.key === 'W') {
-			paddle1Y = Math.max(paddle1Y - PADDLE_SPEED, 0);
-			paddleData = { paddle: 'left', position: paddle1Y };
-		} else if (event.key === 's' || event.key === 'S') {
-			paddle1Y = Math.min(paddle1Y + PADDLE_SPEED, canvas.height - PADDLE_HEIGHT);
-			paddleData = { paddle: 'left', position: paddle1Y };
-		} else if (event.key === 'ArrowUp') {
-			paddle2Y = Math.max(paddle2Y - PADDLE_SPEED, 0);
-			paddleData = { paddle: 'right', position: paddle2Y };
-		} else if (event.key === 'ArrowDown') {
-			paddle2Y = Math.min(paddle2Y + PADDLE_SPEED, canvas.height - PADDLE_HEIGHT);
-			paddleData = { paddle: 'right', position: paddle2Y };
-		}
-		
-		if (paddleData) {
-			socket.send(JSON.stringify({ paddle_data: paddleData }));
-		}
-	});
+        if (event.key === 'ArrowUp') {
+            upKeyPressed = true;
+        } else if (event.key === 'ArrowDown') {
+            downKeyPressed = true;
+        } else if (event.key === 'w' || event.key === 'W') {
+            wKeyPressed = true;
+        } else if (event.key === 's' || event.key === 'S') {
+            sKeyPressed = true;
+        }
+    });
 
     document.addEventListener('keyup', function(event) {
         if (event.key === 'ArrowUp') {
@@ -96,8 +58,6 @@ window.onload = function() {
         }
     });
 }
-
-
 
 function calculateMousePos(evt) {
     var rect = canvas.getBoundingClientRect();
@@ -118,6 +78,7 @@ function handleMouseClick(evt) {
     }
 }
 
+
 function ballReset() {
     if(player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) {
         showingWinScreen = true;
@@ -133,28 +94,24 @@ function moveEverything() {
         return;
     }
 
-    // Control for paddle1Y with 'W' and 'S' keys
     if (wKeyPressed) {
         paddle1Y -= PADDLE_SPEED;
         if (paddle1Y < 0) {
             paddle1Y = 0;
         }
-    }
-    if (sKeyPressed) {
+    } else if (sKeyPressed) {
         paddle1Y += PADDLE_SPEED;
         if (paddle1Y > canvas.height - PADDLE_HEIGHT) {
             paddle1Y = canvas.height - PADDLE_HEIGHT;
         }
     }
 
-    // Control for paddle2Y with Arrow keys
     if (upKeyPressed) {
         paddle2Y -= PADDLE_SPEED;
         if (paddle2Y < 0) {
             paddle2Y = 0;
         }
-    }
-    if (downKeyPressed) {
+    } else if (downKeyPressed) {
         paddle2Y += PADDLE_SPEED;
         if (paddle2Y > canvas.height - PADDLE_HEIGHT) {
             paddle2Y = canvas.height - PADDLE_HEIGHT;
@@ -163,7 +120,7 @@ function moveEverything() {
 
     ballX += ballSpeedX;
     ballY += ballSpeedY;
-    
+	
     if(ballX < 0) {
         if(ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
             ballSpeedX = -ballSpeedX;
